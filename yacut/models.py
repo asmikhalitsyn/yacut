@@ -23,7 +23,3 @@ class URLMap(db.Model):
         for field in api_dict.keys():
             if api_dict[field] in data:
                 setattr(self, field, data[api_dict[field]])
-
-
-
-
