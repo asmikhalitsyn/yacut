@@ -1,7 +1,17 @@
+# Проект YaCut — это сервис укорачивания ссылок
+
+## Автор: Михалицын А.С. ([misterio92](https://github.com/misterio92)) 
+
+
+## **Стек**
+
+[Python](https://www.python.org/)
+[Flask](https://flask.palletsprojects.com/en/2.2.x/).
+
 Клонировать репозиторий и перейти в него в командной строке:
 
 ```
-git clone 
+git clone https://github.com/misterio92/yacut.git
 ```
 
 ```
@@ -34,4 +44,21 @@ python3 -m pip install --upgrade pip
 
 ```
 pip install -r requirements.txt
+```
+
+
+Создание БД и выполнений миграций:
+
+```
+
+flask db init
+flask db migrate
+flask db upgrade
+```
+
+Запуск сервера:
+
+```
+
+flask run
 ```
