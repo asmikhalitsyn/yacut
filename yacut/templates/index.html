@@ -16,19 +16,15 @@
               {{ form.csrf_token }}
               {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text, type="text", id="form-title") }}
               <p>
-                {% if form.original_link.errors %}
-                  {% for error in form.original_link.errors %}
-                    <span style="color: red">*{{ error }}</span>
-                  {% endfor %}
-                {% endif %}
+                {% for error in form.original_link.errors %}
+                <span style="color: red">*{{ error }}</span>
+                {% endfor %}
               </p>
               {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder=form.custom_id.label.text, type="url", id="form-link") }}
               <p>
-                {% if form.custom_id.errors %}
-                  {% for error in form.custom_id.errors %}
-                    <span style="color: red">*{{ error }}</span>
-                  {% endfor %}
-                {% endif %}
+                {% for error in form.custom_id.errors %}
+                  <span style="color: red">*{{ error }}</span>
+                {% endfor %}
               </p>
               {{ form.submit(type="submit", class="btn btn-primary") }}
             </form>
@@ -44,15 +40,13 @@
           <div class="col-sm">
             <h5 class="text-center">
               {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                  {% for message in messages %}
-                    {{ message|safe }}
-                  {% endfor %}
-                {% endif %}
+                {% for message in messages %}
+                  {{ message|safe }}
+                {% endfor %}
               {% endwith %}
-              {% if short_url %}
+              {% if result_url %}
                 <h5 class="text-center">Ваша новая ссылка:</h5>
-                  <a href="{{ url_for('redirect_for_short_url', short_url=short_url, _external=True) }}">{{ url_for('redirect_for_short_url', short_url=short_url, _external=True) }}</a>
+                  <a href="{{ result_url }}">{{ result_url }}</a>
               {% endif %}
             </h5>
           </div>

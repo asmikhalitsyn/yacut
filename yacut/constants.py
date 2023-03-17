@@ -1,9 +1,11 @@
-MAX_LENGTH = 6
+from string import ascii_letters, digits
 
-BUTTON_TO_CREATE = 'Создать'
+RANDOM_SYMBOLS = ascii_letters + digits
+LENGTH_OF_ORIGINAL_URL = 1024
+LENGTH_OF_RANDOM_URL = 6
+LENGTH_OF_SHORT_URL = 16
 
 REQUIRED_FIELD = 'Обязательное поле'
-REGEXP_SHORT_URL = r'^[A-Za-z0-9]+$'
 
 LONG_URL = 'Длинная ссылка'
 SHORT_URL = 'Ваш вариант короткой ссылки'
