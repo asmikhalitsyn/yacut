@@ -3,13 +3,14 @@ from http import HTTPStatus
 from flask import jsonify, request
 
 from . import app
-from .constants import (
-    ID_NO_FOUND,
-    NO_DATA,
-    NO_URL,
-)
+from .constants import ID_NO_FOUND
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
+
+ERROR_NAME = 'Указано недопустимое имя для короткой ссылки'
+NO_DATA = 'Отсутствует тело запроса'
+NO_URL = '\"url\" является обязательным полем!'
+USED_NAME = 'Имя "{custom_id}" уже занято.'
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -19,13 +20,19 @@ def create_url():
         raise InvalidAPIUsage(NO_DATA)
     if 'url' not in data:
         raise InvalidAPIUsage(NO_URL)
-    url = URLMap.create_short_url(data['url'], data.get('custom_id'))
-    return jsonify(url.to_dict()), HTTPStatus.CREATED
+    custom_id = data.get('custom_id')
+    if URLMap.get_short_id(custom_id):
+        raise InvalidAPIUsage(USED_NAME.format(custom_id=custom_id))
+    try:
+        url_map = URLMap.create_short_url(data['url'], data.get('custom_id'))
+    except ValueError:
+        raise InvalidAPIUsage(ERROR_NAME)
+    return jsonify(url_map.to_dict()), HTTPStatus.CREATED
 
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
 def get_original_url(short_id):
-    url = URLMap.check_url(short_id)
-    if url is None:
+    link = URLMap.get_short_id(short_id)
+    if link is None:
         raise InvalidAPIUsage(ID_NO_FOUND, HTTPStatus.NOT_FOUND)
-    return jsonify({'url': url.original}), HTTPStatus.OK
+    return jsonify({'url': link.original}), HTTPStatus.OK

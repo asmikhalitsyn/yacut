@@ -6,12 +6,12 @@ from .constants import (
     LENGTH_OF_ORIGINAL_URL,
     LENGTH_OF_SHORT_URL,
     LONG_URL,
-    REQUIRED_FIELD,
-    RANDOM_SYMBOLS,
     SHORT_URL
 )
+from settings import REGEXP
 
 BUTTON_TO_CREATE = 'Создать'
+REQUIRED_FIELD = 'Обязательное поле'
 
 
 class YacutForm(FlaskForm):
@@ -25,7 +25,7 @@ class YacutForm(FlaskForm):
         validators=[
             Length(max=LENGTH_OF_SHORT_URL),
             Optional(),
-            Regexp(rf'^[{RANDOM_SYMBOLS}]+$')
+            Regexp(REGEXP)
         ]
     )
     submit = SubmitField(BUTTON_TO_CREATE)

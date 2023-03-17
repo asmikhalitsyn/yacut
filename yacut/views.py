@@ -6,6 +6,8 @@ from . import app
 from .forms import YacutForm
 from .models import URLMap
 
+NAME_IS_BUSY = 'Имя {custom_id} уже занято!'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index_view():
@@ -13,12 +15,13 @@ def index_view():
     if not form.validate_on_submit():
         return render_template('index.html', form=form)
     short_url = form.custom_id.data
-    if URLMap.check_url(short_url) is not None:
-        flash(f'Имя {short_url} уже занято!')
+    if URLMap.get_short_id(short_url) is not None:
+        flash(NAME_IS_BUSY.format(custom_id=short_url))
         return render_template('index.html', form=form)
     url = URLMap.create_short_url(
         form.original_link.data,
         form.data.get('custom_id'),
+        validated_form=True
     )
     return render_template(
         'index.html',
@@ -27,9 +30,9 @@ def index_view():
     )
 
 
-@app.route('/<string:short_url>', methods=['GET'])
-def redirect_for_short_url(short_url):
-    url = URLMap.check_url(short_url)
-    if not url:
+@app.route('/<string:short>', methods=['GET'])
+def redirect_for_short_url(short):
+    link = URLMap.get_short_id(short)
+    if not link:
         abort(HTTPStatus.NOT_FOUND)
-    return redirect(url.original), HTTPStatus.FOUND
+    return redirect(link.original), HTTPStatus.FOUND

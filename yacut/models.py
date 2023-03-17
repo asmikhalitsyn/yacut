@@ -1,19 +1,25 @@
 import random
+import re
 from datetime import datetime
-from re import sub
+
+from flask import url_for
 
 from . import db
 from .constants import (
-    ERROR_NAME,
     LENGTH_OF_ORIGINAL_URL,
     LENGTH_OF_SHORT_URL,
     LENGTH_OF_RANDOM_URL,
     RANDOM_SYMBOLS,
 
 )
-from .error_handlers import InvalidAPIUsage
+from settings import REGEXP
 
 USED_NAME = 'Имя "{custom_id}" уже занято.'
+INCORRECT_SYMBOLS = 'Присутствуют некорректные символы'
+INCORRECT_SHORT_LENGTH = (
+    'Длина короткой ссылки {short_length} '
+    'превышает 16'
+)
 
 
 class URLMap(db.Model):
@@ -23,27 +29,26 @@ class URLMap(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     @staticmethod
-    def get_unique_short_id(
+    def generate_short_id(
             symbols=RANDOM_SYMBOLS,
             short_length=LENGTH_OF_RANDOM_URL
     ):
         return ''.join(random.choices(symbols, k=short_length))
 
     @staticmethod
-    def check_url(short):
+    def get_short_id(short):
         return URLMap.query.filter_by(short=short).first()
 
     @staticmethod
-    def create_short_url(original, short=None):
+    def create_short_url(original, short=None, validated_form=False):
         if not short:
-            short = URLMap.get_unique_short_id()
-        if len(short) > LENGTH_OF_SHORT_URL:
-            raise InvalidAPIUsage(ERROR_NAME)
-        incorrect_symbols = sub(rf'[{RANDOM_SYMBOLS}]', '', short)
-        if incorrect_symbols:
-            raise InvalidAPIUsage(ERROR_NAME)
-        if URLMap.check_url(short):
-            raise InvalidAPIUsage(USED_NAME.format(custom_id=short))
+            short = URLMap.generate_short_id()
+        if not validated_form:
+            length_short = len(short)
+            if length_short > LENGTH_OF_SHORT_URL:
+                raise ValueError(INCORRECT_SHORT_LENGTH.format(short_length=length_short))
+            if not re.match(REGEXP, short):
+                raise ValueError(INCORRECT_SYMBOLS)
         url = URLMap(original=original, short=short)
         db.session.add(url)
         db.session.commit()
@@ -52,14 +57,7 @@ class URLMap(db.Model):
     def to_dict(self):
         return dict(
             url=self.original,
-            short_link=f'http://localhost/{self.short}',
-        )
-
-    def from_dict(self, data):
-        api_dict = {
-            'original': 'url',
-            'short': 'custom_id'
-        }
-        for field in api_dict.keys():
-            if api_dict[field] in data:
-                setattr(self, field, data[api_dict[field]])
+            short_link=url_for(
+                'redirect_for_short_url',
+                short=self.short,
+                _external=True))

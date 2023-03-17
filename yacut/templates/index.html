@@ -17,7 +17,7 @@
               {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text, type="text", id="form-title") }}
               <p>
                 {% for error in form.original_link.errors %}
-                <span style="color: red">*{{ error }}</span>
+                  <span style="color: red">*{{ error }}</span>
                 {% endfor %}
               </p>
               {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder=form.custom_id.label.text, type="url", id="form-link") }}
@@ -46,7 +46,7 @@
               {% endwith %}
               {% if result_url %}
                 <h5 class="text-center">Ваша новая ссылка:</h5>
-                  <a href="{{ result_url }}">{{ result_url }}</a>
+                <a href="{{ result_url }}">{{ result_url }}</a>
               {% endif %}
             </h5>
           </div>
