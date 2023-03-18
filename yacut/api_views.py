@@ -20,7 +20,7 @@ def create_url():
     if 'url' not in data:
         raise InvalidAPIUsage(NO_URL)
     try:
-        url_map = URLMap.create_url_map(
+        url_map = URLMap.create(
             data['url'],
             data.get('custom_id'),
             to_validate=True
@@ -34,7 +34,7 @@ def create_url():
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
 def get_original_url(short_id):
-    link_object = URLMap.get_short_object(short_id)
-    if link_object is None:
+    url_map = URLMap.get_url_map(short_id)
+    if url_map is None:
         raise InvalidAPIUsage(ID_NO_FOUND, HTTPStatus.NOT_FOUND)
-    return jsonify({'url': link_object.original}), HTTPStatus.OK
+    return jsonify({'url': url_map.original}), HTTPStatus.OK

@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import abort, redirect, render_template, url_for
+from flask import abort, flash, redirect, render_template, url_for
 
 from . import app
 from .forms import YacutForm
@@ -12,10 +12,13 @@ def index_view():
     form = YacutForm()
     if not form.validate_on_submit():
         return render_template('index.html', form=form)
-    url_map = URLMap.create_url_map(
-        form.original_link.data,
-        form.data.get('custom_id')
-    )
+    try:
+        url_map = URLMap.create(
+            form.original_link.data,
+            form.data.get('custom_id')
+        )
+    except ValueError as error:
+        flash(error)
     return render_template(
         'index.html',
         form=form,
@@ -25,7 +28,7 @@ def index_view():
 
 @app.route('/<string:short>', methods=['GET'])
 def redirect_for_short_url(short):
-    link_object = URLMap.get_short_object(short)
-    if not link_object:
+    url_map = URLMap.get_url_map(short)
+    if not url_map:
         abort(HTTPStatus.NOT_FOUND)
-    return redirect(link_object.original), HTTPStatus.FOUND
+    return redirect(url_map.original), HTTPStatus.FOUND
