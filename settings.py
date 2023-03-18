@@ -1,9 +1,4 @@
 import os
-from re import escape
-
-from yacut.constants import RANDOM_SYMBOLS
-
-REGEXP = rf'^[{escape(RANDOM_SYMBOLS)}]+$'
 
 
 class Config(object):

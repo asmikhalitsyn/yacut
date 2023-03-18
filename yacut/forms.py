@@ -1,14 +1,22 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, URLField
-from wtforms.validators import DataRequired, Length, Optional, Regexp
+from wtforms.validators import (
+    DataRequired,
+    Length,
+    Optional,
+    Regexp,
+    ValidationError
+)
 
 from .constants import (
     LENGTH_OF_ORIGINAL_URL,
     LENGTH_OF_SHORT_URL,
     LONG_URL,
-    SHORT_URL
+    REGEXP,
+    SHORT_URL,
+    USED_NAME
 )
-from settings import REGEXP
+from .models import URLMap
 
 BUTTON_TO_CREATE = 'Создать'
 REQUIRED_FIELD = 'Обязательное поле'
@@ -29,3 +37,7 @@ class YacutForm(FlaskForm):
         ]
     )
     submit = SubmitField(BUTTON_TO_CREATE)
+
+    def validate_custom_id(self, field):
+        if field.data and URLMap.get_short_link(field.data):
+            raise ValidationError(USED_NAME.format(name=field.data))
