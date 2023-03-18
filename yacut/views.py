@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, redirect, render_template, url_for
 
 from . import app
 from .forms import YacutForm
@@ -18,7 +18,7 @@ def index_view():
             form.data.get('custom_id')
         )
     except ValueError as error:
-        flash(error)
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
     return render_template(
         'index.html',
         form=form,

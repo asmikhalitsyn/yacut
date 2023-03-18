@@ -15,7 +15,7 @@ from .constants import (
 )
 from .error_handlers import ShortValueError
 
-NO_FIND_SHORT = 'Не удалось сгенерировать короткий url'
+NOT_FIND_SHORT_URL = 'Не удалось подобрать короткий url!'
 USED_NAME = 'Имя "{custom_id}" уже занято.'
 INCORRECT_SYMBOLS = 'Присутствуют некорректные символы'
 INCORRECT_ORIGINAL_LENGTH = (
@@ -39,7 +39,7 @@ class URLMap(db.Model):
         return URLMap.query.filter_by(short=short).first()
 
     @staticmethod
-    def generate_short_id(
+    def get_unique_short_id(
             symbols=RANDOM_SYMBOLS,
             short_length=LENGTH_OF_RANDOM_URL
     ):
@@ -47,12 +47,13 @@ class URLMap(db.Model):
             random_short = ''.join(random.choices(symbols, k=short_length))
             if not URLMap.get_url_map(random_short):
                 return random_short
-        raise ValueError(NO_FIND_SHORT)
+        raise ValueError(NOT_FIND_SHORT_URL)
+
 
     @staticmethod
     def create(original, short=None, to_validate=False):
         if not short:
-            short = URLMap.generate_short_id()
+            short = URLMap.get_unique_short_id()
         elif to_validate:
             length_original = len(original)
             length_short = len(short)
