@@ -12,7 +12,7 @@ from .constants import (
     LENGTH_OF_ORIGINAL_URL,
     LENGTH_OF_SHORT_URL,
     LONG_URL,
-    REGEXP,
+    CORRECT_SYMBOLS,
     SHORT_URL,
     USED_NAME
 )
@@ -33,11 +33,11 @@ class YacutForm(FlaskForm):
         validators=[
             Length(max=LENGTH_OF_SHORT_URL),
             Optional(),
-            Regexp(REGEXP)
+            Regexp(CORRECT_SYMBOLS)
         ]
     )
     submit = SubmitField(BUTTON_TO_CREATE)
 
     def validate_custom_id(self, field):
-        if field.data and URLMap.get_short_link(field.data):
+        if field.data and URLMap.get_short_object(field.data):
             raise ValidationError(USED_NAME.format(name=field.data))

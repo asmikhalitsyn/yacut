@@ -1,8 +1,9 @@
 from re import escape
 from string import ascii_letters, digits
 
+ATTEMPT_NUMBER = 10
 RANDOM_SYMBOLS = ascii_letters + digits
-REGEXP = rf'^[{escape(RANDOM_SYMBOLS)}]+$'
+CORRECT_SYMBOLS = rf'^[{escape(RANDOM_SYMBOLS)}]+$'
 LENGTH_OF_ORIGINAL_URL = 1024
 LENGTH_OF_RANDOM_URL = 6
 LENGTH_OF_SHORT_URL = 16

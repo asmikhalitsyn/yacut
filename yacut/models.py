@@ -6,14 +6,16 @@ from flask import url_for
 
 from . import db
 from .constants import (
+    ATTEMPT_NUMBER,
+    CORRECT_SYMBOLS,
     LENGTH_OF_ORIGINAL_URL,
     LENGTH_OF_SHORT_URL,
     LENGTH_OF_RANDOM_URL,
-    RANDOM_SYMBOLS,
-    REGEXP
-
+    RANDOM_SYMBOLS
 )
+from .error_handlers import ShortValueError
 
+NOT_FIND_SHORT = 'короткий url не удалось подобрать'
 USED_NAME = 'Имя "{custom_id}" уже занято.'
 INCORRECT_SYMBOLS = 'Присутствуют некорректные символы'
 INCORRECT_ORIGINAL_LENGTH = (
@@ -33,27 +35,31 @@ class URLMap(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     @staticmethod
-    def get_short_link(short):
+    def get_short_object(short):
         return URLMap.query.filter_by(short=short).first()
 
     @staticmethod
-    def create_short_url(original, short=None, validator=False):
+    def create_url_map(original, short=None, to_validate=False):
         if not short:
-            while not short:
-                random_value = ''.join(random.choices(RANDOM_SYMBOLS, k=LENGTH_OF_RANDOM_URL))
-                if not URLMap.get_short_link(random_value):
-                    short = random_value
-        elif not validator:
+            for _ in range(ATTEMPT_NUMBER):
+                if not URLMap.get_short_object(
+                        ''.join(random.choices(
+                            RANDOM_SYMBOLS, k=LENGTH_OF_RANDOM_URL
+                        ))):
+                    short = ''.join(random.choices(
+                        RANDOM_SYMBOLS, k=LENGTH_OF_RANDOM_URL
+                    ))
+        elif to_validate:
             length_original = len(original)
             length_short = len(short)
             if length_original > LENGTH_OF_ORIGINAL_URL:
                 raise ValueError(INCORRECT_ORIGINAL_LENGTH.format(original_length=length_original))
             if length_short > LENGTH_OF_SHORT_URL:
                 raise ValueError(INCORRECT_SHORT_LENGTH.format(short_length=length_short))
-            if not re.match(REGEXP, short):
+            if not re.match(CORRECT_SYMBOLS, short):
                 raise ValueError(INCORRECT_SYMBOLS)
-            if URLMap.get_short_link(short):
-                raise NameError(USED_NAME.format(custom_id=short))
+            if URLMap.get_short_object(short):
+                raise ShortValueError(USED_NAME.format(custom_id=short))
         url = URLMap(original=original, short=short)
         db.session.add(url)
         db.session.commit()
