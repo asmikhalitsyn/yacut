@@ -17,7 +17,7 @@ def index_view():
             form.original_link.data,
             form.data.get('custom_id')
         )
-    except ValueError as error:
+    except ValueError:
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
     return render_template(
         'index.html',

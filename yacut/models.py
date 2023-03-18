@@ -49,7 +49,6 @@ class URLMap(db.Model):
                 return random_short
         raise ValueError(NOT_FIND_SHORT_URL)
 
-
     @staticmethod
     def create(original, short=None, to_validate=False):
         if not short:
