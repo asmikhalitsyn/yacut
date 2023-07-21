@@ -1,6 +1,6 @@
 # Проект YaCut — это сервис укорачивания ссылок
 
-## Автор: Михалицын А.С. ([misterio92](https://github.com/asmikhalitsyn)) 
+## Автор: Михалицын А.С. ([asmikhalitsyn](https://github.com/asmikhalitsyn)) 
 
 
 ## **Стек**
